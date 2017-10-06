@@ -23,7 +23,7 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollection
  * @package Magestore\OrderSuccess\Model\Repository
  */
 class OrderRepository extends \Magento\Sales\Model\OrderRepository
-                      implements OrderRepositoryInterface
+    implements OrderRepositoryInterface
 {
     /**
      * @var \Magento\Sales\Model\ResourceModel\Order
@@ -61,7 +61,8 @@ class OrderRepository extends \Magento\Sales\Model\OrderRepository
         OrderFactory $orderFactory,
         QueryProcessorInterface $queryProcessor,
         OrderCollectionFactory $orderCollectionFactory
-    ) {
+    )
+    {
         parent::__construct($metadata, $searchResultFactory);
         $this->resource = $resource;
         $this->orderFactory = $orderFactory;
@@ -71,7 +72,7 @@ class OrderRepository extends \Magento\Sales\Model\OrderRepository
 
     /**
      * create a new batch
-     * 
+     *
      * @return BatchInterface
      */
     public function newBatch()
@@ -90,15 +91,15 @@ class OrderRepository extends \Magento\Sales\Model\OrderRepository
      */
     public function massUpdate($orderIds, $actionKey, $actionValue)
     {
-        if(!count($orderIds)){
+        if (!count($orderIds)) {
             return;
         }
         $this->queryProcessor->start('massUpdateBatch');
 
         $this->queryProcessor->addQuery([
             'type' => QueryProcessorInterface::QUERY_TYPE_UPDATE,
-            'values' =>  [$actionKey => $actionValue],
-            'condition' => [OrderInterface::ENTITY_ID. ' IN (?)' => $orderIds],
+            'values' => [$actionKey => $actionValue],
+            'condition' => [OrderInterface::ENTITY_ID . ' IN (?)' => $orderIds],
             'table' => $this->resource->getMainTable()
         ], 'massUpdateBatch');
         $this->queryProcessor->process('massUpdateBatch');
@@ -156,14 +157,14 @@ class OrderRepository extends \Magento\Sales\Model\OrderRepository
 
     /**
      * Retrieve requets in a Batch
-     * 
+     *
      * @param array $batchIds
      * @return \Magento\Sales\Api\Data\OrderSearchResultInterface
      */
     public function getOrderListFromBatch($batchIds)
     {
         $orders = $this->orderCollectionFactory->create()
-            ->addFieldToFilter('batch_id', ['in'=>$batchIds]);
+            ->addFieldToFilter('batch_id', ['in' => $batchIds]);
         return $orders;
     }
 

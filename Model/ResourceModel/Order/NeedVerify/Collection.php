@@ -19,17 +19,17 @@ class Collection extends \Magestore\OrderSuccess\Model\ResourceModel\Order\Colle
      * @param
      * @return $this
      */
-    public function addCondition(){
+    public function addCondition()
+    {
         $this->addFieldToFilter('is_verified', 0);
         $this->addFieldToFilter('main_table.status', array(
-                                        'nin'=> array(
-                                            OrderInterface::STATE_HOLDED,
-                                            OrderInterface::STATE_CANCELED,
-                                            OrderInterface::STATE_CLOSED,
-                                            OrderInterface::STATE_COMPLETE
-                                            )
-                                        ))
-            ;
+            'nin' => array(
+                OrderInterface::STATE_HOLDED,
+                OrderInterface::STATE_CANCELED,
+                OrderInterface::STATE_CLOSED,
+                OrderInterface::STATE_COMPLETE
+            )
+        ));
     }
 
 }

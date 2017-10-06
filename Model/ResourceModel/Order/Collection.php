@@ -20,6 +20,7 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
      * \Magestore\OrderSuccess\Helper\Data
      */
     protected $helper;
+
     /**
      * Initialize dependencies.
      *
@@ -39,7 +40,8 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
         EventManager $eventManager,
         $mainTable = 'sales_order_grid',
         $resourceModel = '\Magento\Sales\Model\ResourceModel\Order'
-    ) {
+    )
+    {
         $this->helper = $helper;
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
@@ -54,20 +56,30 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
                 [
                     'age' => new \Zend_Db_Expr('TIMESTAMPDIFF(SECOND, main_table.created_at, NOW())')
                 ]);
+        $this->addFilterToMap(
+            'entity_id',
+            'main_table.entity_id'
+        )->addFilterToMap(
+            'customer_id',
+            'main_table.customer_id'
+        )->addFilterToMap(
+            'quote_address_id',
+            'main_table.quote_address_id'
+        );
         $this->getSelect()->joinLeft(
             ['order_history' => $this->getTable('sales_order_status_history')],
             'main_table.entity_id = order_history.parent_id',
             [
                 'note' => new \Zend_Db_Expr(
                     'GROUP_CONCAT(
-                                    CONCAT(
-                                        "\n",
-                                        DATE_FORMAT(order_history.created_at,\'%b %d %Y %h:%i %p\'),
-                                        ": ",
-                                        order_history.comment
-                                    )
-                                    SEPARATOR "\n"
-                                 )'
+                        CONCAT(
+                            "\n",
+                            DATE_FORMAT(order_history.created_at,\'%b %d %Y %h:%i %p\'),
+                            ": ",
+                            order_history.comment
+                        )
+                        SEPARATOR "\n"
+                    )'
                 ),
                 'order_history_id' => 'order_history.entity_id'
             ]
@@ -111,8 +123,8 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
             $field = new \Zend_Db_Expr('TIMESTAMPDIFF(SECOND, main_table.created_at, NOW())');
         }
         if ($field == 'tag_color') {
-            $field =  'sales_order.tag_color';
-            $condition =  array('like' => '%'.$condition['eq'].'%');
+            $field = 'sales_order.tag_color';
+            $condition = array('like' => '%' . $condition['eq'] . '%');
         }
         return parent::addFieldToFilter($field, $condition);
     }
@@ -122,7 +134,8 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
      *
      * @return int|null
      */
-    public function getCurrentPage(){
+    public function getCurrentPage()
+    {
         return $this->getCurPage();
     }
 
@@ -132,7 +145,8 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
      * @param int $currentPage
      * @return $this
      */
-    public function setCurrentPage($currentPage){
+    public function setCurrentPage($currentPage)
+    {
         return $this->setCurPage($currentPage);
     }
 
@@ -142,7 +156,8 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
      * @param
      * @return $this
      */
-    public function addCondition(){
+    public function addCondition()
+    {
         return $this;
     }
 }
