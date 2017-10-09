@@ -73,6 +73,7 @@ $orderStoreDate = $block->formatDate(
                             <td><?php /* @escapeNotVerified */ echo $block->getOrderStoreName() ?></td>
                         </tr>
                     <?php endif; ?>
+                    <?php echo $block->getChildHtml(); ?>
                     <?php if ($_order->getRelationChildId()): ?>
                         <tr>
                             <th><?php /* @escapeNotVerified */ echo __('Link to the New Sales') ?></th>
