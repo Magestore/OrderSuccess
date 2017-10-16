@@ -133,7 +133,7 @@ abstract class OrderAbstract extends \Magento\Backend\App\Action
     protected function _initAction()
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Magestore_OrderSuccess::order');
+        $resultPage->setActiveMenu('Magestore_OrderSuccess::all');
         $resultPage->addBreadcrumb(__('Orders'), __('Orders'));
         $resultPage->addBreadcrumb(__('Orders'), __('Orders'));
         return $resultPage;
