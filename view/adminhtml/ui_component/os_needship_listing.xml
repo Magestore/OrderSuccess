@@ -83,6 +83,7 @@
                     </item>
                 </argument>
             </action>
+            <!--
             <action name="dropship">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
@@ -92,6 +93,7 @@
                     </item>
                 </argument>
             </action>
+            -->
             <action name="hold_order">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
