@@ -34,7 +34,8 @@ class Collection extends \Magestore\OrderSuccess\Model\ResourceModel\Order\Colle
                                           COALESCE(sales_order.total_due, 0) - COALESCE(sales_order.total_canceled, 0)
                                         ')
                                     ]);
-        $this->addFieldToFilter('real_total_due', array('gt'=>0));
+        $this->getSelect()->where('COALESCE(sales_order.total_due, 0) - COALESCE(sales_order.total_canceled, 0) > 0');
+        //$this->addFieldToFilter('real_total_due', array('gt'=>0));
     }
 
     /**
