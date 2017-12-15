@@ -45,6 +45,13 @@ cache:
     - $HOME/.nvm
     - $HOME/node_modules
 before_install:
+  - |
+    # Add Github credential for private repository, note: use remote url begin https://
+    if [ ! -z $GIT_CREDENTIAL ]; then
+        echo "Install GIT_CREDENTIAL"
+        git config --global credential.helper store
+        echo ${GIT_CREDENTIAL} > ~/.git-credentials
+    fi
   - mkdir ./devops-travis
   - git clone --depth=1 --branch=master $TEST_FRAMEWORK ./devops-travis
   - cp -rf devops-travis/* .
