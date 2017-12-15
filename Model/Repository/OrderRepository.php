@@ -1,10 +1,8 @@
 <?php
-
 /**
  * Copyright © 2016 Magestore. All rights reserved.
  * See COPYING.txt for license details.
  */
-
 namespace Magestore\OrderSuccess\Model\Repository;
 
 use Magestore\OrderSuccess\Api\Data\OrderInterface;
@@ -17,20 +15,34 @@ use Magestore\OrderSuccess\Model\OrderFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magestore\OrderSuccess\Model\Db\QueryProcessorInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Exception\InputException;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Sales\Api\Data\OrderExtensionInterface;
 use Magento\Sales\Api\Data\ShippingAssignmentInterface;
 use Magento\Sales\Model\Order\ShippingAssignmentBuilder;
 use Magento\Framework\App\ObjectManager;
-
 /**
  * Class OrderRepository
  * @package Magestore\OrderSuccess\Model\Repository
  */
 class OrderRepository implements OrderRepositoryInterface
 {
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order
+     */
+    protected $resource;
+    /**
+     * @var \Magestore\OrderSuccess\Model\OrderFactory
+     */
+    protected $orderFactory;
+    /**
+     * @var \Magestore\OrderSuccess\Model\Db\QueryProcessorInterface
+     */
+    protected $queryProcessor;
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     */
+    protected $orderCollectionFactory;
 
     /**
      * @var Metadata
@@ -53,34 +65,9 @@ class OrderRepository implements OrderRepositoryInterface
     private $shippingAssignmentBuilder;
 
     /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
      * @var OrderInterface[]
      */
     protected $registry = [];
-
-    /**
-     * @var \Magento\Sales\Model\ResourceModel\Order
-     */
-    protected $resource;
-
-    /**
-     * @var \Magestore\OrderSuccess\Model\OrderFactory
-     */
-    protected $orderFactory;
-
-    /**
-     * @var \Magestore\OrderSuccess\Model\Db\QueryProcessorInterface
-     */
-    protected $queryProcessor;
-
-    /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
-     */
-    protected $orderCollectionFactory;
 
     /**
      * OrderRepository constructor.
@@ -90,6 +77,7 @@ class OrderRepository implements OrderRepositoryInterface
      * @param OrderFactory $orderFactory
      * @param QueryProcessorInterface $queryProcessor
      * @param OrderCollectionFactory $orderCollectionFactory
+     * @param OrderExtensionFactory|null $orderExtensionFactory
      */
     public function __construct(
         Metadata $metadata,
@@ -98,22 +86,107 @@ class OrderRepository implements OrderRepositoryInterface
         OrderFactory $orderFactory,
         QueryProcessorInterface $queryProcessor,
         OrderCollectionFactory $orderCollectionFactory,
-        Metadata $metadata,
-        SearchResultFactory $searchResultFactory,
-        CollectionProcessorInterface $collectionProcessor = null,
         \Magento\Sales\Api\Data\OrderExtensionFactory $orderExtensionFactory = null
     )
     {
-        $this->metadata = $metadata;
-        $this->searchResultFactory = $searchResultFactory;
-        $this->collectionProcessor = $collectionProcessor ?: ObjectManager::getInstance()
-            ->get(\Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface::class);
-        $this->orderExtensionFactory = $orderExtensionFactory ?: ObjectManager::getInstance()
-            ->get(\Magento\Sales\Api\Data\OrderExtensionFactory::class);
         $this->resource = $resource;
         $this->orderFactory = $orderFactory;
         $this->queryProcessor = $queryProcessor;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->metadata = $metadata;
+        $this->searchResultFactory = $searchResultFactory;
+        $this->orderExtensionFactory = $orderExtensionFactory ?: ObjectManager::getInstance()
+            ->get(\Magento\Sales\Api\Data\OrderExtensionFactory::class);
+    }
+    /**
+     * create a new batch
+     *
+     * @return BatchInterface
+     */
+    public function newBatch()
+    {
+        $batch = $this->batchFactory->create();
+        $batch->setUserId($this->session->getUser()->getId());
+        return $this->save($batch);
+    }
+    /**
+     * Mass update order
+     *
+     * @param string $actionKey
+     * @param string $actionValue
+     * @param array $orderIds
+     */
+    public function massUpdate($orderIds, $actionKey, $actionValue)
+    {
+        if (!count($orderIds)) {
+            return;
+        }
+        $this->queryProcessor->start('massUpdateBatch');
+        $this->queryProcessor->addQuery([
+            'type' => QueryProcessorInterface::QUERY_TYPE_UPDATE,
+            'values' => [$actionKey => $actionValue],
+            'condition' => [OrderInterface::ENTITY_ID . ' IN (?)' => $orderIds],
+            'table' => $this->resource->getMainTable()
+        ], 'massUpdateBatch');
+        $this->queryProcessor->process('massUpdateBatch');
+    }
+    /**
+     * Mass update batch Id of orders
+     *
+     * @param array $orderIds
+     * @param int $batchId
+     */
+    public function massUpdateBatch($orderIds, $batchId)
+    {
+        $this->massUpdate($orderIds, OrderInterface::BATCH_ID, $batchId);
+    }
+    /**
+     * Mass veriy orders
+     *
+     * @param array $orderIds
+     * @param boolean $isVerify
+     */
+    public function massVerify($orderIds, $isVerify)
+    {
+        $this->massUpdate($orderIds, OrderInterface::IS_VERIFIED, $isVerify);
+    }
+    /**
+     * Mass update tag orders
+     *
+     * @param array $orderIds
+     * @param boolean $isVerify
+     */
+    public function massUpdateTag($orderIds, $tag)
+    {
+        $this->massUpdate($orderIds, OrderInterface::TAG_COLOR, $tag);
+    }
+    /**
+     * Retrieve Sales.
+     *
+     * @param int $orderId
+     * @return \Magestore\OrderSuccess\Api\Data\OrderInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getById($orderId)
+    {
+        $order = $this->orderFactory->create();
+        $this->resource->load($order, $orderId);
+        if (!$order->getId()) {
+            throw new NoSuchEntityException(__('The order with ID "%1" does not exist.', $orderId));
+        }
+        return $order;
+    }
+    /**
+     * Retrieve requets in a Batch
+     *
+     * @param array $batchIds
+     * @return \Magento\Sales\Api\Data\OrderSearchResultInterface
+     */
+    public function getOrderListFromBatch($batchIds)
+    {
+        $orders = $this->orderCollectionFactory->create()
+            ->addFieldToFilter('batch_id', ['in' => $batchIds]);
+        return $orders;
     }
 
     /**
@@ -151,8 +224,32 @@ class OrderRepository implements OrderRepositoryInterface
     {
         /** @var \Magento\Sales\Api\Data\OrderSearchResultInterface $searchResult */
         $searchResult = $this->searchResultFactory->create();
-        $this->collectionProcessor->process($searchCriteria, $searchResult);
+//        $this->collectionProcessor->process($searchCriteria, $searchResult);
+//        $searchResult->setSearchCriteria($searchCriteria);
+//        foreach ($searchResult->getItems() as $order) {
+//            $this->setShippingAssignments($order);
+//        }
+//        return $searchResult;
+        foreach ($searchCriteria->getFilterGroups() as $filterGroup) {
+            $this->addFilterGroupToCollection($filterGroup, $searchResult);
+        }
+
+        $sortOrders = $searchCriteria->getSortOrders();
+        if ($sortOrders === null) {
+            $sortOrders = [];
+        }
+        /** @var \Magento\Framework\Api\SortOrder $sortOrder */
+        foreach ($sortOrders as $sortOrder) {
+            $field = $sortOrder->getField();
+            $searchResult->addOrder(
+                $field,
+                ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+            );
+        }
+
         $searchResult->setSearchCriteria($searchCriteria);
+        $searchResult->setCurPage($searchCriteria->getCurrentPage());
+        $searchResult->setPageSize($searchCriteria->getPageSize());
         foreach ($searchResult->getItems() as $order) {
             $this->setShippingAssignments($order);
         }
@@ -268,104 +365,4 @@ class OrderRepository implements OrderRepositoryInterface
             $searchResult->addFieldToFilter($fields, $conditions);
         }
     }
-
-    /**
-     * create a new batch
-     *
-     * @return BatchInterface
-     */
-    public function newBatch()
-    {
-        $batch = $this->batchFactory->create();
-        $batch->setUserId($this->session->getUser()->getId());
-        return $this->save($batch);
-    }
-
-    /**
-     * Mass update order
-     *
-     * @param string $actionKey
-     * @param string $actionValue
-     * @param array $orderIds
-     */
-    public function massUpdate($orderIds, $actionKey, $actionValue)
-    {
-        if (!count($orderIds)) {
-            return;
-        }
-        $this->queryProcessor->start('massUpdateBatch');
-
-        $this->queryProcessor->addQuery([
-            'type' => QueryProcessorInterface::QUERY_TYPE_UPDATE,
-            'values' => [$actionKey => $actionValue],
-            'condition' => [OrderInterface::ENTITY_ID . ' IN (?)' => $orderIds],
-            'table' => $this->resource->getMainTable()
-        ], 'massUpdateBatch');
-        $this->queryProcessor->process('massUpdateBatch');
-    }
-
-    /**
-     * Mass update batch Id of orders
-     *
-     * @param array $orderIds
-     * @param int $batchId
-     */
-    public function massUpdateBatch($orderIds, $batchId)
-    {
-        $this->massUpdate($orderIds, OrderInterface::BATCH_ID, $batchId);
-    }
-
-    /**
-     * Mass veriy orders
-     *
-     * @param array $orderIds
-     * @param boolean $isVerify
-     */
-    public function massVerify($orderIds, $isVerify)
-    {
-        $this->massUpdate($orderIds, OrderInterface::IS_VERIFIED, $isVerify);
-    }
-
-    /**
-     * Mass update tag orders
-     *
-     * @param array $orderIds
-     * @param boolean $isVerify
-     */
-    public function massUpdateTag($orderIds, $tag)
-    {
-        $this->massUpdate($orderIds, OrderInterface::TAG_COLOR, $tag);
-    }
-
-    /**
-     * Retrieve Sales.
-     *
-     * @param int $orderId
-     * @return \Magestore\OrderSuccess\Api\Data\OrderInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function getById($orderId)
-    {
-        $order = $this->orderFactory->create();
-        $this->resource->load($order, $orderId);
-        if (!$order->getId()) {
-            throw new NoSuchEntityException(__('The order with ID "%1" does not exist.', $orderId));
-        }
-        return $order;
-    }
-
-    /**
-     * Retrieve requets in a Batch
-     *
-     * @param array $batchIds
-     * @return \Magento\Sales\Api\Data\OrderSearchResultInterface
-     */
-    public function getOrderListFromBatch($batchIds)
-    {
-        $orders = $this->orderCollectionFactory->create()
-            ->addFieldToFilter('batch_id', ['in' => $batchIds]);
-        return $orders;
-    }
-
 }
-

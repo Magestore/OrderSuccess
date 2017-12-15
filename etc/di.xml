@@ -60,6 +60,17 @@
                 </item>
             </argument>
         </arguments>
-    </type> 
+    </type>
+    <virtualType name="orderMetadata" type="Magento\Sales\Model\ResourceModel\Metadata">
+        <arguments>
+            <argument name="resourceClassName" xsi:type="string">Magento\Sales\Model\ResourceModel\Order</argument>
+            <argument name="modelClassName" xsi:type="string">Magento\Sales\Model\Order</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magestore\OrderSuccess\Model\Repository\OrderRepository">
+        <arguments>
+            <argument name="metadata" xsi:type="object">orderMetadata</argument>
+        </arguments>
+    </type>
     
 </config>
