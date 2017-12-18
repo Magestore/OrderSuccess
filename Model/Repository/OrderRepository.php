@@ -5,7 +5,8 @@
  */
 namespace Magestore\OrderSuccess\Model\Repository;
 
-use Magestore\OrderSuccess\Api\Data\OrderInterface;
+use Magestore\OrderSuccess\Api\Data\OrderInterface as MagestoreOrderInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magestore\OrderSuccess\Api\Data\BatchInterface;
 use Magestore\OrderSuccess\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\ResourceModel\Metadata;
@@ -138,7 +139,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function massUpdateBatch($orderIds, $batchId)
     {
-        $this->massUpdate($orderIds, OrderInterface::BATCH_ID, $batchId);
+        $this->massUpdate($orderIds, MagestoreOrderInterface::BATCH_ID, $batchId);
     }
     /**
      * Mass veriy orders
@@ -148,7 +149,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function massVerify($orderIds, $isVerify)
     {
-        $this->massUpdate($orderIds, OrderInterface::IS_VERIFIED, $isVerify);
+        $this->massUpdate($orderIds, MagestoreOrderInterface::IS_VERIFIED, $isVerify);
     }
     /**
      * Mass update tag orders
@@ -158,7 +159,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function massUpdateTag($orderIds, $tag)
     {
-        $this->massUpdate($orderIds, OrderInterface::TAG_COLOR, $tag);
+        $this->massUpdate($orderIds, MagestoreOrderInterface::TAG_COLOR, $tag);
     }
     /**
      * Retrieve Sales.
