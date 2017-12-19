@@ -65,8 +65,9 @@ before_script:
   - ${TRAVIS_BUILD_DIR}/dev/travis/before_script.sh
 script:
   - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
-  - ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh 2>&1 >${TRAVIS_BUILD_DIR}/test_results.txt
-  - if [ -f ${TRAVIS_BUILD_DIR}/test_results.txt ]; then cat ${TRAVIS_BUILD_DIR}/test_results.txt; fi
+  - travis_wait 180 ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
+  - RESULT_FILE="${TRAVIS_BUILD_DIR}/test_results.txt"
+  - if [ -f $RESULT_FILE ]; then cat $RESULT_FILE; fi
 after_failure:
   - MESSAGE="error"
   - |
