@@ -138,7 +138,12 @@ class Grid extends \Magento\Backend\Block\Template
     public function getShipment()
     {
         $order = $this->getOrder();
-        return $this->shipmentFactory->create($order, [], []);
+        $items = [];
+        /** @var \Magento\Sales\Model\Order\Item $orderItem */
+        foreach ($order->getAllItems() as $orderItem) {
+            $items[$orderItem->getId()] = $orderItem->getQtyToShip();
+        }
+        return $this->shipmentFactory->create($order, $items, []);
     }
 
     /**
