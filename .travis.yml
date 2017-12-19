@@ -54,7 +54,7 @@ before_install:
     fi
   - mkdir ./devops-travis
   - git clone --depth=1 --branch=master $TEST_FRAMEWORK ./devops-travis
-  - cp -rf devops-travis/* .
+  - cp -rf devops-travis/m2/* .
   - sudo usermod --shell /bin/bash www-data
   - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/before_install.sh
   - ${TRAVIS_BUILD_DIR}/dev/travis/before_install.sh
