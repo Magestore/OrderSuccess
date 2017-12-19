@@ -84,3 +84,4 @@ after_script:
   - chmod +x ./dev/travis/write_log.sh
   - ./dev/travis/write_log.sh
   - chmod +x ./dev/travis/message.sh && ./dev/travis/message.sh
+
