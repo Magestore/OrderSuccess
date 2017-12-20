@@ -30,7 +30,7 @@ env:
     - MAGENTO_HOST_NAME="magento2.travis"
     - TEST_CASE="https://github.com/Magestore/automation-testing-omc.git"
     - TEST_LOG="https://github.com/Magestore/automation-testing-log.git"
-    - TEST_FRAMEWORK="git@github.com:Magestore/devops-travis-magento-ftf.git"
+    - TEST_FRAMEWORK="https://github.com/Magestore/devops-travis-magento-ftf.git"
     - secure: "gcw8NoxlvpwUrTeWKqEvD/N6SiBuONeG4LdKby31NWk3+QfwvR6QKtQFw37Pj6WPHZgD7zn4b1RkXdviz/VYFxe0xaPKHf3mAf6PLJvkU0Y+GnbigUCrzoO4Vg1pyFsgoQJuxHPZ4++8j9ekg1m6Znb6D+GZlMii7jAD02c12btfBZeH5TU+TQbLz7STSAUkU+gcCHGJrAQRBoIj75LdctShLuw0+z6ksuMNfDep2Lcl+ph7KGioW2WwXZ1ADYOQLvJNSmK/39FyARMIkC/3MOM5dRDDHxO45dx9RicExmjLAlzu0JCCpHm4u9XMEazyMZQBUyAvhQChS1MYu3KTBQzi8OLAOt5tHi6F5novgtsCKl3dz4b/P+Qj1HwgBqTYXyCOp/qykr3YQ3PkZxiAyemAcYBnpCkunSRUEiDKKasfHE194+xP8i/3eDe+66E8ndVxhF7wR5oeUAcBOTYIkVVKnxpIc1WK8FQmu9na5xLZdDpLgmh4kMFtTgpRDDkXMDZc4i/epy1d6Z+AebsJqd7PJj1jQKSEA8fQjkX1/rvfygyyMWxRnd9FNW+80rlVwJMD8Cyf38H9O19V4I2csAmKP+lzoTs/4sMW20NEwsYL4QdW0Rqt599zRTEDP2a+FRWKgLdkfjgLj3V8uQq3/alBLG2AVDKuNeSf9zBbDrg="
 # safelist
 branches:
@@ -54,7 +54,7 @@ before_install:
     fi
   - mkdir ./devops-travis
   - git clone --depth=1 --branch=master $TEST_FRAMEWORK ./devops-travis
-  - cp -rf devops-travis/* .
+  - cp -rf devops-travis/m2/* .
   - sudo usermod --shell /bin/bash www-data
   - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/before_install.sh
   - ${TRAVIS_BUILD_DIR}/dev/travis/before_install.sh
@@ -65,8 +65,9 @@ before_script:
   - ${TRAVIS_BUILD_DIR}/dev/travis/before_script.sh
 script:
   - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
-  - ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh 2>&1 >${TRAVIS_BUILD_DIR}/test_results.txt
-  - if [ -f ${TRAVIS_BUILD_DIR}/test_results.txt ]; then cat ${TRAVIS_BUILD_DIR}/test_results.txt; fi
+  - travis_wait 180 ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
+  - RESULT_FILE="${TRAVIS_BUILD_DIR}/test_results.txt"
+  - if [ -f $RESULT_FILE ]; then cat $RESULT_FILE; fi
 after_failure:
   - MESSAGE="error"
   - |
