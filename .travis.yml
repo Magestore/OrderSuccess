@@ -17,14 +17,11 @@ php:
 env:
   global:
     - TEST_FILTER="OrderSuccess"
-    # this repo is type 2 - composer install
-    - REPO_TYPE="2"
     # magento version 2.2.1 - https://github.com/Magestore/devops-magento-2.2.1.git
     - MAGENTO_VER="2.2.1"
     # SAMPLE_DATA is suffixe of magento repository with sample data
     # https://github.com/Magestore/devops-magento-2.2.1-sampledata.git
     #- SAMPLE_DATA="sampledata"
-
     - INTEGRATION_SETS=3
     - NODE_JS_VERSION=6
     - MAGENTO_HOST_NAME="magento2.travis"
@@ -32,6 +29,14 @@ env:
     - TEST_LOG="https://github.com/Magestore/automation-testing-log.git"
     - TEST_FRAMEWORK="https://github.com/Magestore/devops-travis-magento-ftf.git"
     - secure: "gcw8NoxlvpwUrTeWKqEvD/N6SiBuONeG4LdKby31NWk3+QfwvR6QKtQFw37Pj6WPHZgD7zn4b1RkXdviz/VYFxe0xaPKHf3mAf6PLJvkU0Y+GnbigUCrzoO4Vg1pyFsgoQJuxHPZ4++8j9ekg1m6Znb6D+GZlMii7jAD02c12btfBZeH5TU+TQbLz7STSAUkU+gcCHGJrAQRBoIj75LdctShLuw0+z6ksuMNfDep2Lcl+ph7KGioW2WwXZ1ADYOQLvJNSmK/39FyARMIkC/3MOM5dRDDHxO45dx9RicExmjLAlzu0JCCpHm4u9XMEazyMZQBUyAvhQChS1MYu3KTBQzi8OLAOt5tHi6F5novgtsCKl3dz4b/P+Qj1HwgBqTYXyCOp/qykr3YQ3PkZxiAyemAcYBnpCkunSRUEiDKKasfHE194+xP8i/3eDe+66E8ndVxhF7wR5oeUAcBOTYIkVVKnxpIc1WK8FQmu9na5xLZdDpLgmh4kMFtTgpRDDkXMDZc4i/epy1d6Z+AebsJqd7PJj1jQKSEA8fQjkX1/rvfygyyMWxRnd9FNW+80rlVwJMD8Cyf38H9O19V4I2csAmKP+lzoTs/4sMW20NEwsYL4QdW0Rqt599zRTEDP2a+FRWKgLdkfjgLj3V8uQq3/alBLG2AVDKuNeSf9zBbDrg="
+matrix:
+  include:
+    - env:
+      - MAGENTO_VER="2.2.1"
+      - SAMPLE_DATA="sampledata"
+    - env:
+      - MAGENTO_VER="2.2.2"
+      - SAMPLE_DATA="sampledata"
 # safelist
 branches:
   only:
