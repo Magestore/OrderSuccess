@@ -35,7 +35,7 @@ matrix:
       - MAGENTO_VER="2.2.1"
       - SAMPLE_DATA="sampledata"
     - env:
-      - MAGENTO_VER="2.2.2"
+      - MAGENTO_VER="2.1.11"
       - SAMPLE_DATA="sampledata"
 # safelist
 branches:
