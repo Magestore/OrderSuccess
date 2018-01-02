@@ -32,7 +32,7 @@ env:
 matrix:
   include:
     - env: MAGENTO_VER="2.2.1" SAMPLE_DATA="sampledata"
-    - php: 5.6
+    - php: 7.0.25
       env: MAGENTO_VER="2.1.11" SAMPLE_DATA="sampledata"
 # safelist
 branches:
@@ -66,7 +66,8 @@ before_script:
   - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/before_script.sh
   - ${TRAVIS_BUILD_DIR}/dev/travis/before_script.sh
 script:
-  - sudo chmod +x ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
+  - sudo chmod -R +x ${TRAVIS_BUILD_DIR}/dev/travis/test_*.sh
+  - travis_wait 180 ${TRAVIS_BUILD_DIR}/dev/travis/test_coding_standard.sh
   - travis_wait 180 ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
 after_failure:
   - MESSAGE="error"
