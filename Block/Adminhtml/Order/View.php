@@ -111,16 +111,19 @@ class View extends \Magento\Sales\Block\Adminhtml\Order\View
             }
             if(!$this->needVerify()) {
                 if ($this->isBackOrder($order)) {
-                    $this->buttonList->add(
-                        'order_back_ship',
-                        [
-                            'label' => __('Back to ship'),
-                            'onclick' => 'setLocation(\'' . $this->getNeedShipUrl($order->getId(), $orderPosition) . '\')',
-                            'class' => 'back_verify'
-                        ],
-                        '1',
-                        '99'
-                    );
+                    if (isset($orderPosition)) {
+                        $this->buttonList->add(
+                            'order_back_ship',
+                            [
+                                'label' => __('Back to ship'),
+                                'onclick' => 'setLocation(\'' . $this->getNeedShipUrl($order->getId(), $orderPosition) . '\')',
+                                'class' => 'back_verify'
+                            ],
+                            '1',
+                            '99'
+                        );
+                    }
+
                 }
             }
         }
@@ -135,10 +138,10 @@ class View extends \Magento\Sales\Block\Adminhtml\Order\View
     public function getVerifyUrl($orderId, $orderPosition)
     {
         return $this->getUrl('ordersuccess/order/verify',
-                            [
-                                'order_id' => $orderId,
-                                'order_position' => $orderPosition
-                            ]);
+            [
+                'order_id' => $orderId,
+                'order_position' => $orderPosition
+            ]);
     }
 
     /**
@@ -163,10 +166,10 @@ class View extends \Magento\Sales\Block\Adminhtml\Order\View
     public function getBackVerifyUrl($orderId, $orderPosition)
     {
         return $this->getUrl('ordersuccess/order/backverify',
-                            [
-                                'order_id' => $orderId,
-                                'order_position' => $orderPosition
-                            ]);
+            [
+                'order_id' => $orderId,
+                'order_position' => $orderPosition
+            ]);
     }
 
     /**
@@ -204,7 +207,7 @@ class View extends \Magento\Sales\Block\Adminhtml\Order\View
     public function useShip()
     {
         return $this->_scopeConfig->getValue(self::SECTION_CONFIG_ORDER_SHIP,
-                                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -215,7 +218,7 @@ class View extends \Magento\Sales\Block\Adminhtml\Order\View
     public function needVerify()
     {
         return $this->_scopeConfig->getValue(self::SECTION_CONFIG_ORDER_VERIFY,
-                                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 
     /**

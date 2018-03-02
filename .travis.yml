@@ -71,15 +71,15 @@ script:
   - travis_wait 180 ${TRAVIS_BUILD_DIR}/dev/travis/test_script.sh
 after_failure:
   - MESSAGE="error"
-  - |
-    echo "============Extension log:============="
-    if [ -f /var/www/var/log/exception.log ]; then cat /var/www/var/log/exception.log ; fi
-  - |
-    echo "============System log:============="
-    if [ -f /var/www/var/log/system.log ]; then cat /var/www/var/log/system.log ; fi
-  - |
-    echo "============Debug log:============="
-    if [ -f /var/www/var/log/debug.log ]; then cat /var/www/var/log/debug.log ; fi
+  # - |
+  #   echo "============Extension log:============="
+  #   if [ -f /var/www/var/log/exception.log ]; then cat /var/www/var/log/exception.log ; fi
+  # - |
+  #   echo "============System log:============="
+  #   if [ -f /var/www/var/log/system.log ]; then cat /var/www/var/log/system.log ; fi
+  # - |
+  #   echo "============Debug log:============="
+  #   if [ -f /var/www/var/log/debug.log ]; then cat /var/www/var/log/debug.log ; fi
 after_script:
   - cd ${TRAVIS_BUILD_DIR}
   - chmod +x ./dev/travis/write_log.sh

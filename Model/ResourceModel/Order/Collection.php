@@ -160,4 +160,22 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Grid\Collectio
     {
         return $this;
     }
+
+    /**
+     * @return $data
+     */
+    public function getData()
+    {
+        $data = parent::getData();
+        $om = \Magento\Framework\App\ObjectManager::getInstance();
+        $timeZone = $om->get('Magento\Framework\Stdlib\DateTime\TimezoneInterface');
+        $requestInterface = $om->get('Magento\Framework\App\RequestInterface');
+        if( ($requestInterface->getActionName() == 'gridToCsv') || ($requestInterface->getActionName() == 'gridToXml')){
+            foreach ($data as &$item) {
+                $item['created_at'] = $timeZone->date($item['created_at'])->format('Y-m-d H:i:s');
+            }
+        }
+        return $data;
+    }
+
 }
