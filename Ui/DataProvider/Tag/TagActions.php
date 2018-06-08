@@ -64,7 +64,7 @@ class TagActions
     {
         $actions = [];
         $tagList = $this->tag->getTagList();
-        if(count($tagList)) {
+        if(count($tagList) && is_array($tagList)) {
             foreach($tagList as $tag) {
                 $actions[] = [
                     'type' => '#'.$tag['color'],
