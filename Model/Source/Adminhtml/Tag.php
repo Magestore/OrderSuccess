@@ -49,8 +49,12 @@ class Tag implements \Magestore\OrderSuccess\Api\Data\TagSourceInterface
         $tags = [];
         $tags[] = ['value' => 'na', 'label' => '-- '.__('Add Tag').' --'];
         $tags[] = ['value' => 'remove', 'label' => __('Remove All Tags')];
-        foreach($this->getTagList() as $tag){
-            $tags[] = ['value' => '#'.$tag['color'], 'label' => $tag['title']];
+        $tagList = $this->getTagList();
+        if(count($tagList) && is_array($tagList)) {
+            ;
+            foreach ($this->getTagList() as $tag) {
+                $tags[] = ['value' => '#' . $tag['color'], 'label' => $tag['title']];
+            }
         }
         return $tags;
     }
