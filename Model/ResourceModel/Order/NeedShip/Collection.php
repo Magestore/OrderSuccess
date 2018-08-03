@@ -11,12 +11,12 @@ namespace Magestore\OrderSuccess\Model\ResourceModel\Order\NeedShip;
  */
 class Collection extends \Magestore\OrderSuccess\Model\ResourceModel\Order\Collection
 {
-    protected $qtyOrdered = 'sales_order_item.qty_ordered
+    protected $qtyOrdered = 'SUM(sales_order_item.qty_ordered
                 - sales_order_item.qty_shipped
                 - sales_order_item.qty_refunded
                 - sales_order_item.qty_canceled
                 - COALESCE(sales_order_item.qty_backordered, 0)
-                - COALESCE(sales_order_item.qty_prepareship, 0)';
+                - COALESCE(sales_order_item.qty_prepareship, 0))';
 
     /**
      * @return $this
@@ -62,7 +62,7 @@ class Collection extends \Magestore\OrderSuccess\Model\ResourceModel\Order\Colle
             ['qty_ordered' => new \Zend_Db_Expr($this->qtyOrdered)]
         );
 
-        $this->addFieldToFilter('qty_ordered', array('gt' => 0));
+        $this->getSelect()->having(new \Zend_Db_Expr($this->qtyOrdered).' > ?', 0);
     }
 
     /**

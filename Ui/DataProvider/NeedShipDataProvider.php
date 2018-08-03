@@ -21,5 +21,11 @@ class NeedShipDataProvider extends \Magestore\OrderSuccess\Ui\DataProvider\Order
         $collection= $this->context->getNeedShipCollectionFactory()->create();
         return $collection;
     }
-    
+
+    public function getData()
+    {
+        $data = parent::getData();
+        $data['totalRecords'] = count($data['items']);
+        return $data;
+    }
 }
